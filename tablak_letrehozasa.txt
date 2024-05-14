@@ -1,0 +1,93 @@
+CSAPATOK TÁBLA
+
+CREATE TABLE csapatok (
+    id               NVARCHAR2(10) NOT NULL,
+    nev              NVARCHAR2(30) NOT NULL,
+    elnok            NVARCHAR2(30),
+    szakmai_igazgato NVARCHAR2(30),
+    vezetoedzo       NVARCHAR2(30),
+    csapatkapitany   NVARCHAR2(30) NOT NULL
+);
+
+ALTER TABLE csapatok ADD CONSTRAINT csapatok_pk PRIMARY KEY ( id );
+
+
+
+
+MÉRKŐZÉSEK TÁBLA
+
+CREATE TABLE merkozesek (
+    hazai_csapat_id  NVARCHAR2(10) NOT NULL,
+    vendeg_csapat_id NVARCHAR2(10) NOT NULL,
+    kapott_gol       INTEGER,
+    szerzett_gol     INTEGER,
+    fordulo_id       INTEGER NOT NULL
+);
+
+ALTER TABLE merkozesek ADD CONSTRAINT merkozesek_pk PRIMARY KEY ( hazai_csapat_id,
+                                                                  vendeg_csapat_id );
+
+ALTER TABLE merkozesek
+    ADD CONSTRAINT merkozesek_csapatok_fk FOREIGN KEY ( hazai_csapat_id )
+        REFERENCES csapatok ( id );
+
+ALTER TABLE merkozesek
+    ADD CONSTRAINT merkozesek_csapatok_fkv2 FOREIGN KEY ( vendeg_csapat_id )
+        REFERENCES csapatok ( id );
+
+ALTER TABLE merkozesek
+    ADD CONSTRAINT merkozesek_fordulok_fk FOREIGN KEY ( fordulo_id )
+        REFERENCES fordulok ( fordulo_id );
+
+
+
+STADIONOK TÁBLA
+
+CREATE TABLE stadionok (
+    stadion_id  INTEGER NOT NULL,
+    stadion_nev NVARCHAR2(40) NOT NULL,
+    epites      INTEGER,
+    ferohely    INTEGER,
+    csapatok_id NVARCHAR2(10) NOT NULL
+);
+
+CREATE UNIQUE INDEX stadionok__idx ON
+    stadionok (
+        csapatok_id
+    ASC );
+
+ALTER TABLE stadionok ADD CONSTRAINT stadionok_pk PRIMARY KEY ( stadion_id );
+
+ALTER TABLE stadionok
+    ADD CONSTRAINT stadionok_csapatok_fk FOREIGN KEY ( csapatok_id )
+        REFERENCES csapatok ( id );
+
+
+
+FORDULÓK TÁBLA
+
+CREATE TABLE fordulok (
+    fordulo_id INTEGER NOT NULL,
+    datum      DATE
+);
+
+ALTER TABLE fordulok ADD CONSTRAINT fordulok_pk PRIMARY KEY ( fordulo_id );
+
+
+
+
+GÓLLÖVŐLISTA TÁBLA
+
+CREATE TABLE gollovolista (
+    jatekos        NVARCHAR2(30) NOT NULL,
+    csapat_id      NVARCHAR2(10) NOT NULL,
+    helyezes       INTEGER NOT NULL,
+    szerzett_golok INTEGER NOT NULL
+);
+
+ALTER TABLE gollovolista ADD CONSTRAINT gollovolista_pk PRIMARY KEY ( jatekos );
+
+ALTER TABLE gollovolista
+    ADD CONSTRAINT gollovolista_csapatok_fk FOREIGN KEY ( csapat_id )
+        REFERENCES csapatok ( id );
+
